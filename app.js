@@ -1,28 +1,28 @@
 const express = require('express')
 const articleRouter = require('./routes/articles')
-const mongoose = require('mongoose')
 const app = express()
+const Article = require("./models/articles")
 app.set('view engine', 'ejs')
 
 app.use(express.json());
-app.use(express.urlencoded({extended: false}))
+app.use(express.urlencoded({extended: true}))
+
 app.use('/articles', articleRouter) 
 
 
-app.get('/', (req, res)=> {
-    const articles = [{
-        title: 'Test Article',
-        createdAt: new Date(),
-        description: 'Test description'
-    },
-{
-    title: 'Test Article 2',
-        createdAt: new Date(),
-        description: 'Test description 2'
-}]
+app.get('/', async (req, res)=> {
+   const articles = await Article.find()
+   .sort({creeatedAt: "desc"})
     res.render('articles/index', {articles: articles})
 })
 
+
+app.use((err, req, res, next) => {
+    // console.log(err);
+    res.status(500).json({
+        error: err.message 
+    })
+})
 
 
 
